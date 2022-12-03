@@ -3,6 +3,7 @@ package main
 import (
 	"aoc2022/util"
 	"log"
+	"time"
 )
 
 type elfMove string
@@ -18,10 +19,13 @@ const (
 )
 
 func main() {
+	start := time.Now()
 	input := util.GetInput("02")
 	rawMoves := util.Get2dString(input, "\n", " ")
 	partOne(rawMoves)
 	partTwo(rawMoves)
+	elapsed := time.Now().Sub(start)
+	log.Println("该函数执行完成耗时：", elapsed)
 }
 
 func partOne(rawMoves [][]string) {
