@@ -33,7 +33,10 @@ func main() {
 		calSum[i] = total
 	}
 	partOne(calSum)
+	partTwo(calSum)
+}
 
+func partTwo(calSum []int) {
 	maxOne := 0
 	maxTwo := 0
 	maxThree := 0
