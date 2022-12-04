@@ -107,6 +107,12 @@ func Print2DString(TDString [][]string, join string) {
 
 }
 
+func ParseInt(num string) int {
+	v, err := strconv.Atoi(num)
+	Check(err)
+	return v
+}
+
 func SixToTwo(input string) string {
 	convMap := make(map[string]string)
 	convMap["0"] = "0000"
