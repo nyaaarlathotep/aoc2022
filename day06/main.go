@@ -10,7 +10,6 @@ import (
 func main() {
 	start := time.Now()
 	input := util.GetInput("06")
-	stacks := initialStack()
 
 	rawInstructs := util.Get2dString(input, "\n", " ")
 	instructs := make([][3]int, 0)
@@ -18,22 +17,32 @@ func main() {
 		instructs = append(instructs,
 			[3]int{util.ParseInt(rawInstruct[1]), util.ParseInt(rawInstruct[3]), util.ParseInt(rawInstruct[5])})
 	}
+	partOne(instructs)
+	partTwo(instructs)
+	elapsed := time.Now().Sub(start)
+	log.Println("该函数执行完成耗时：", elapsed)
+}
 
+func partTwo(instructs [][3]int) {
+	stacks := initialStack()
 	for _, instruct := range instructs {
-		for i := 0; i < instruct[0]; i++ {
-			stacks[instruct[2]-1].Push(stacks[instruct[1]-1].Pop())
-			//for _, s := range stacks {
-			//	s.Traverse()
-			//}
-		}
+		pushMulti(popMulti(instruct[0], &stacks[instruct[1]-1]), &stacks[instruct[2]-1])
 	}
-
 	for _, stack := range stacks {
 		log.Printf("%v", stack.Pop())
 	}
+}
 
-	elapsed := time.Now().Sub(start)
-	log.Println("该函数执行完成耗时：", elapsed)
+func partOne(instructs [][3]int) {
+	stacks := initialStack()
+	for _, instruct := range instructs {
+		for i := 0; i < instruct[0]; i++ {
+			stacks[instruct[2]-1].Push(stacks[instruct[1]-1].Pop())
+		}
+	}
+	for _, stack := range stacks {
+		log.Printf("%v", stack.Pop())
+	}
 }
 
 func initialTestStack() []DataStruct.Stack {
@@ -56,4 +65,18 @@ func initialStack() []DataStruct.Stack {
 	initialStacks[7] = DataStruct.NewStack("D", "N", "J", "V", "R", "Z", "H", "Q")
 	initialStacks[8] = DataStruct.NewStack("B", "N", "H", "M", "S")
 	return initialStacks
+}
+func pushMulti(data []interface{}, s *DataStruct.Stack) bool {
+	for i := len(data) - 1; i >= 0; i-- {
+		s.Push(data[i])
+	}
+	return true
+}
+
+func popMulti(count int, s *DataStruct.Stack) []interface{} {
+	res := make([]interface{}, 0)
+	for i := 0; i < count; i++ {
+		res = append(res, s.Pop())
+	}
+	return res
 }
