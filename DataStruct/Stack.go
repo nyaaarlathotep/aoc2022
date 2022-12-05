@@ -1,8 +1,10 @@
 package DataStruct
 
-import "fmt"
+import (
+	"fmt"
+)
 
-const initSize int = 20
+const initSize int = 50
 
 type Stack struct {
 	size int
@@ -10,12 +12,16 @@ type Stack struct {
 	data []interface{}
 }
 
-// NewStack 创建并初始化栈，返回strck
-func NewStack() Stack {
+// NewStack 创建并初始化栈，返回stack
+func NewStack(elements ...interface{}) Stack {
 	s := Stack{}
 	s.size = initSize
 	s.top = -1
 	s.data = make([]interface{}, initSize)
+
+	for _, e := range elements {
+		s.Push(e)
+	}
 	return s
 }
 
@@ -33,7 +39,7 @@ func (s *Stack) IsFull() bool {
 func (s *Stack) Push(data interface{}) bool {
 	// 首先判断栈是否已满
 	if s.IsFull() {
-		fmt.Println("stack is full, push failed")
+		panic("stack is full, push failed")
 		return false
 	}
 	// 栈顶指针+1
@@ -47,7 +53,7 @@ func (s *Stack) Push(data interface{}) bool {
 func (s *Stack) Pop() interface{} {
 	// 判断是否是空栈
 	if s.IsEmpty() {
-		fmt.Println("stack is empty , pop error")
+		panic("stack is empty , pop error")
 		return -1
 	}
 	// 把栈顶的元素赋值给临时变量tmp
@@ -77,6 +83,7 @@ func (s *Stack) Traverse() {
 	}
 
 	for i := 0; i <= s.top; i++ {
-		fmt.Println(s.data[i], " ")
+		fmt.Printf("%+v ", s.data[i])
 	}
+	fmt.Printf("\n")
 }
