@@ -112,6 +112,11 @@ func ParseInt(num string) int {
 	Check(err)
 	return v
 }
+func ParseInt64(num string) int64 {
+	v, err := strconv.Atoi(num)
+	Check(err)
+	return int64(v)
+}
 
 func SixToTwo(input string) string {
 	convMap := make(map[string]string)
