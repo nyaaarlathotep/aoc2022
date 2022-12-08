@@ -2,7 +2,7 @@ package util
 
 import (
 	"bytes"
-	"fmt"
+	"log"
 	"strconv"
 	"strings"
 	"unicode"
@@ -102,15 +102,27 @@ func RemoveByLoop(slc []string) []string {
 
 func Print2DString(TDString [][]string, join string) {
 	for _, v := range TDString {
-		fmt.Println(strings.Join(v, join))
+		log.Println(strings.Join(v, join))
 	}
+}
 
+func Print2DInt(TDString [][]int, join string) {
+	for _, v := range TDString {
+		log.Println(strings.Join(Parse2DString(v), join))
+	}
 }
 
 func ParseInt(num string) int {
 	v, err := strconv.Atoi(num)
 	Check(err)
 	return v
+}
+func Parse2DString(num []int) []string {
+	str := make([]string, len(num))
+	for i, v := range num {
+		str[i] = strconv.Itoa(v)
+	}
+	return str
 }
 func ParseInt64(num string) int64 {
 	v, err := strconv.Atoi(num)
