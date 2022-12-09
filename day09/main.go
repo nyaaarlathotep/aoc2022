@@ -20,10 +20,21 @@ func main() {
 		x: 0,
 		y: 0,
 	}
+	ropeKonts := make([]*point, 10)
+	ropeKonts[0] = head
+	for i := 1; i < 10; i++ {
+		ropeKonts[i] = &point{
+			x: 0,
+			y: 0,
+		}
+	}
+
 	traces := make(map[point]bool)
+	tracesPartTwo := make(map[point]bool)
 	for _, line := range instructs {
 		for i := 0; i < util.ParseInt(line[1]); i++ {
 			traces[*tail] = false
+			tracesPartTwo[*ropeKonts[9]] = false
 			if line[0] == "D" {
 				head.y--
 			} else if line[0] == "U" {
@@ -36,12 +47,15 @@ func main() {
 				panic("???")
 			}
 			moveTail(head, tail)
-
+			for j := 0; j < len(ropeKonts)-1; j++ {
+				moveTail(ropeKonts[j], ropeKonts[j+1])
+			}
 		}
 	}
 	traces[*tail] = false
+	tracesPartTwo[*ropeKonts[9]] = false
 	log.Printf("%+v", len(traces))
-	//log.Printf("%+v", (traces))
+	log.Printf("%+v", len(tracesPartTwo))
 	elapsed := time.Now().Sub(start)
 	log.Println("该函数执行完成耗时：", elapsed)
 
