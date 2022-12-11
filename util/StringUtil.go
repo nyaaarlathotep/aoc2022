@@ -113,6 +113,7 @@ func Print2DInt(TDString [][]int, join string) {
 }
 
 func ParseInt(num string) int {
+	num = strings.Trim(num, " ")
 	v, err := strconv.Atoi(num)
 	Check(err)
 	return v
