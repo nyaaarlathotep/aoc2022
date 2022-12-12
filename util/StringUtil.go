@@ -2,6 +2,7 @@ package util
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -100,18 +101,24 @@ func RemoveByLoop(slc []string) []string {
 	return res
 }
 
-func Print2DString(TDString [][]string, join string) {
+func Print2DSlice[T int | string | float64](TDString [][]T, join string) {
 	for _, v := range TDString {
-		log.Println(strings.Join(v, join))
+		line := ""
+		for _, s := range v {
+			line = line + fmt.Sprintf("%v%v", s, join)
+		}
+		log.Println(line)
 	}
 }
-
-func Print2DInt(TDString [][]int, join string) {
+func Print2DRune(TDString [][]rune, join string) {
 	for _, v := range TDString {
-		log.Println(strings.Join(Parse2DString(v), join))
+		line := ""
+		for _, s := range v {
+			line = line + fmt.Sprintf("%v%v", string(s), join)
+		}
+		log.Println(line)
 	}
 }
-
 func ParseInt(num string) int {
 	num = strings.Trim(num, " ")
 	v, err := strconv.Atoi(num)
