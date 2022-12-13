@@ -7,7 +7,7 @@ import (
 	"aoc2022/routing"
 )
 
-func MineBFS(g routing.Graph, start DataStruct.Point, goal DataStruct.Point) []DataStruct.Point {
+func BFS(g routing.Graph, start DataStruct.Point, goal DataStruct.Point) []DataStruct.Point {
 	var frontier DataStruct.Queue[DataStruct.Point]
 	frontier.Put(start)
 
