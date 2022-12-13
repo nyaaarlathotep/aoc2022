@@ -20,4 +20,4 @@ YEAH, I'm a genius. Such a trick.
 
 ## day12
 
-Thanks, reddit.
+Thanks, reddit, I learned a lot.

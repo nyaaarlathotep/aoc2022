@@ -5,6 +5,7 @@ import (
 	"aoc2022/DataStruct"
 	"aoc2022/c"
 	"aoc2022/util"
+	"golang.org/x/exp/maps"
 	"log"
 	"time"
 )
@@ -13,42 +14,27 @@ func main() {
 	startTime := time.Now()
 	inputM := util.GetInput("12")
 	heightMap := util.Get2dString(inputM, "\n", "")
-	//g, _, _ := initialHeightRuneMap(heightMap)
 	g, s, e := initialHeightRuneMap(heightMap)
-	log.Printf("%+v", g)
-	log.Printf("%+v", HeightMap{g}.Neighbours(DataStruct.Point{
-		X: 0,
-		Y: 0,
-	}))
 
-	log.Printf("%v", len(BFS.MineBFS(HeightMap{g}, s, e))-1)
-	//var start, end aoc.Point
-	//data := aoc.SliceFromFile("day12.txt", func(l string) []rune {
-	//	return []rune(l)
-	//})
-	//input := grid.New[rune](int64(len(data[0])), int64(len(data)), grid.Directions4)
-	//for y, l := range data {
-	//	for x, s := range l {
-	//		switch s {
-	//		case 'S':
-	//			start = aoc.Point{int64(x), int64(y)}
-	//			s = 'a'
-	//		case 'E':
-	//			end = aoc.Point{int64(x), int64(y)}
-	//			s = 'z'
-	//		}
-	//		input.SetState(int64(x), int64(y), s)
-	//	}
-	//}
-	//log.Printf("%+v", input)
-	//log.Printf("%+v", HeightMap{input}.Neighbours(aoc.Point{
-	//	X: 0,
-	//	Y: 0,
-	//}))
-	//
-	//fmt.Println(do1(HeightMap{input}, start, end))
+	partOne(g, s, e)
+	partTwo(g, e)
+
 	elapsed := time.Now().Sub(startTime)
 	log.Println("该函数执行完成耗时：", elapsed)
+}
+
+func partTwo(g *DataStruct.Grid[rune], e DataStruct.Point) {
+	starts := g.StateMapWhere(func(r rune) bool { return r == 'a' })
+	startPoints := maps.Keys(starts)
+	pathMap := c.Map(startPoints, func(p DataStruct.Point) int {
+		return len(BFS.MineBFS(HeightMap{g}, p, e))
+	})
+	pathMap = c.Select(pathMap, func(path int) bool { return path > 1 })
+	log.Printf("%+v", c.Min(pathMap)-1)
+}
+
+func partOne(g *DataStruct.Grid[rune], s DataStruct.Point, e DataStruct.Point) {
+	log.Printf("%v", len(BFS.MineBFS(HeightMap{g}, s, e))-1)
 }
 
 //func main() {
@@ -124,20 +110,7 @@ type HeightMap struct {
 
 func (h HeightMap) Neighbours(p DataStruct.Point) []DataStruct.Point {
 	height := h.GetState(p.Y, p.X)
-	log.Printf("%+v", h.Grid.Neighbours(p))
 	return c.Select(h.Grid.Neighbours(p), func(p DataStruct.Point) bool {
 		return h.GetState(p.Y, p.X) <= height+1
 	})
 }
-
-//
-//type HeightMap struct {
-//	*grid.Grid[rune]
-//}
-//
-//func (h HeightMap) Neighbours(p aoc.Point) []aoc.Point {
-//	height := h.GetState(p.Y, p.X)
-//	return c.Select(h.Grid.Neighbours(p), func(x aoc.Point) bool {
-//		return h.GetState(x.Y, x.X) <= height+1
-//	})
-//}
