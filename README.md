@@ -21,3 +21,9 @@ YEAH, I'm a genius. Such a trick.
 ## day12
 
 Thanks, reddit, I learned a lot.
+
+## day14
+
+I've benn spending a lot of time telling the differences between coordinates transform.
+
+My eyes!
