@@ -400,3 +400,13 @@ func Chunk[T any](in []T, size int) [][]T {
 
 	return ret
 }
+
+func POne[T int | int64](num T) T {
+	if num > 0 {
+		return 1
+	}
+	if num < 0 {
+		return -1
+	}
+	return 0
+}

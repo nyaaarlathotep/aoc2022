@@ -1,7 +1,6 @@
 package DataStruct
 
 import (
-	"fmt"
 	"strings"
 
 	"golang.org/x/exp/slices"
@@ -104,12 +103,12 @@ func (g *Grid[T]) GetState(y, x int64) T {
 	return g.state[y][x]
 }
 
-func (g *Grid[T]) StateString() string {
+func (g *Grid[T]) StateString(f func(t T) string) string {
 	var ret strings.Builder
 
 	for _, y := range g.state {
 		for _, x := range y {
-			ret.WriteString(fmt.Sprintf("%v", x))
+			ret.WriteString(f(x))
 		}
 		ret.WriteRune('\n')
 	}
