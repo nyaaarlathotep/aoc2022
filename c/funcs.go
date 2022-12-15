@@ -410,3 +410,7 @@ func POne[T int | int64](num T) T {
 	}
 	return 0
 }
+
+func Abs[T int | int64](num T) T {
+	return num * POne(num)
+}
