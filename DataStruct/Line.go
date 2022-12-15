@@ -21,6 +21,10 @@ func (l *Line) Involve(l1 *Line) bool {
 		(l1.Start >= l.Start && l1.End <= l.End)
 }
 
+func (l *Line) Contain(l1 *Line) bool {
+	return l1.Start >= l.Start && l1.End <= l.End
+}
+
 func (l *Line) Add(l1 Line) Line {
 	if l1.Start > l.Start {
 		l1.Start = l.Start

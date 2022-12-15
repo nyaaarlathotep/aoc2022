@@ -31,3 +31,5 @@ My eyes!
 ## day15
 
 overlap...
+
+lol, it's the first time that the brute force works.
