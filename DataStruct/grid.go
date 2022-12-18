@@ -106,7 +106,11 @@ func (g *Grid[T]) GetState(y, x int64) T {
 func (g *Grid[T]) StateString(f func(t T) string) string {
 	var ret strings.Builder
 
-	for _, y := range g.state {
+	for i, y := range g.state {
+		if i > 20 {
+			break
+		}
+		//ret.WriteString(string(rune(i)))
 		for _, x := range y {
 			ret.WriteString(f(x))
 		}
