@@ -43,3 +43,7 @@ I thought this one may be the hardest of the year.
 Damn! I initialized a wrong rock...
 
 I've been working on it for a long time.
+
+## day18
+
+There are cubes not connected to other cubes...
