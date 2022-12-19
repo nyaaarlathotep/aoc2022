@@ -1,104 +1,190 @@
 package main
 
 import (
-	"aoc2022/DataStruct"
 	"aoc2022/util"
 	"fmt"
-	"log"
-	"time"
+	"strings"
+
+	"github.com/Olegas/goaocd"
 )
 
-func main() {
-	start := time.Now()
-	input := util.GetInput("17")
-	winds := util.GetStringSlice(input, "")
-	g := DataStruct.NewGrid[rune](7, 7600, DataStruct.Directions4)
+type Fig struct {
+	pos    goaocd.Pos
+	points []goaocd.Pos
+	h      int
+	w      int
+}
 
-	rocks := []rock{{
-		points: []DataStruct.Point{{X: 2, Y: 0}, {X: 3, Y: 0}, {X: 4, Y: 0}, {X: 5, Y: 0}},
-		height: 1,
-	}, {
-		points: []DataStruct.Point{{X: 2, Y: 1}, {X: 3, Y: 1}, {X: 4, Y: 1}, {X: 3, Y: 2}, {X: 3, Y: 0}},
-		height: 3,
-	}, {
-		points: []DataStruct.Point{{X: 2, Y: 0}, {X: 3, Y: 0}, {X: 4, Y: 0}, {X: 4, Y: 1}, {X: 4, Y: 2}},
-		height: 3,
-	}, {
-		points: []DataStruct.Point{{X: 2, Y: 0}, {X: 2, Y: 1}, {X: 2, Y: 2}, {X: 2, Y: 3}},
-		height: 4,
-	}, {
-		points: []DataStruct.Point{{X: 2, Y: 0}, {X: 3, Y: 0}, {X: 2, Y: 1}, {X: 3, Y: 1}},
-		height: 2,
-	}}
-	windIndex := 0
-	height := int64(3)
-	for rockIndex := int64(0); rockIndex < 2022; rockIndex++ {
-		rockNow := rocks[rockIndex%5]
-		heightNow := height
-		xOfAll := int64(0)
-		for true {
-			//fmt.Println("height!!!!", heightNow)
-			wind := getWind(winds, &windIndex)
-			xNow := getXMove(wind)
-			crash := getCrash(rockNow, xOfAll+xNow, g, heightNow)
-			if !crash {
-				xOfAll += xNow
-			}
-			heightNow--
-			crash = getCrash(rockNow, xOfAll, g, heightNow)
-			if crash {
-				heightNow++
-				for _, p := range rockNow.points {
-					g.SetState(p.X+xOfAll, p.Y+heightNow, '#')
-				}
-				if heightNow+rockNow.height+3 > height {
-					height = heightNow + rockNow.height + 3
-				}
-				//fmt.Printf("%v", g.StateString(func(r rune) string {
-				//	if r == 0 {
-				//		return "."
-				//	}
-				//	return string(r)
-				//}))
-				//fmt.Println("-----------")
+var figures = []Fig{
+	{points: []goaocd.Pos{{0, 0}, {1, 0}, {2, 0}, {3, 0}}, h: 1, w: 4},
+	{points: []goaocd.Pos{{1, 0}, {0, 1}, {1, 1}, {2, 1}, {1, 2}}, h: 3, w: 3},
+	{points: []goaocd.Pos{{0, 0}, {1, 0}, {2, 0}, {2, 1}, {2, 2}}, h: 3, w: 3},
+	{points: []goaocd.Pos{{0, 0}, {0, 1}, {0, 2}, {0, 3}}, h: 4, w: 1},
+	{points: []goaocd.Pos{{0, 0}, {1, 0}, {0, 1}, {1, 1}}, h: 2, w: 2},
+}
+
+type State struct {
+	height  int
+	stopped int
+}
+
+type Key struct {
+	depth [7]int
+	fig   int
+	move  int
+}
+
+func sample() []string {
+	d := `>>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>`
+	return strings.Split(d, "")
+}
+
+func figCanMove(fig *Fig, move *goaocd.Pos, w int, screen *[]uint8) bool {
+	px := fig.pos.X + move.X
+	py := fig.pos.Y + move.Y
+	for _, i := range fig.points {
+		x := px + i.X
+		if x < 0 || x >= w {
+			return false
+		}
+		y := py + i.Y
+		if (*screen)[y]&(1<<x) != 0 {
+			return false
+		}
+
+	}
+	return true
+}
+
+func drawFig(fig *Fig, screen *[]uint8) {
+	for _, i := range fig.points {
+		x := fig.pos.X + i.X
+		y := fig.pos.Y + i.Y
+		(*screen)[y] |= 1 << x
+	}
+}
+
+func calcDepthMap(screen *[]uint8, top int) [7]int {
+	res := [7]int{}
+	for i := 0; i < 7; i++ {
+		m := uint8(1 << i)
+		for j := top; j >= 0; j-- {
+			if (*screen)[j]&m != 0 {
+				res[i] = top - j
 				break
 			}
 		}
 	}
-	fmt.Println(height - 3)
-	elapsed := time.Now().Sub(start)
-	log.Println("该函数执行完成耗时：", elapsed)
+	return res
 }
 
-func getWind(winds []string, windIndex *int) string {
-	wind := winds[*windIndex]
-	*windIndex++
-	*windIndex = *windIndex % len(winds)
-	return wind
-}
+func simulate(maxStoppedRocks int) int64 {
+	checkPatterns := true
+	highestPoint := 0
+	width := 7
+	heightInCycles := 0
+	moves := sample()
+	input := util.GetInput("17")
+	moves = util.GetStringSlice(input, "")
 
-func getCrash(rockNow rock, xMove int64, g *DataStruct.Grid[rune], heightNow int64) bool {
-	for _, p := range rockNow.points {
-		xAfterWind := p.X + xMove
-		if heightNow < 0 || xAfterWind < 0 || xAfterWind >= g.XLen() {
-			return true
+	movesPos := make([]goaocd.Pos, len(moves))
+	for idx, s := range moves {
+		p := goaocd.Pos{X: -1, Y: 0}
+		if s == ">" {
+			p.X = 1
 		}
-		if g.GetState(p.Y+heightNow, xAfterWind) == '#' {
-			return true
+		movesPos[idx] = p
+	}
+
+	newFigOffset := goaocd.Pos{X: 2, Y: 4}
+	moveDown := goaocd.Pos{X: 0, Y: -1}
+	screen := make([]uint8, 1)
+	seen := make(map[Key]State)
+
+	filledLineValue := (1 << width) - 1
+	screen[0] = uint8(filledLineValue)
+
+	figI := 0
+	moveI := 0
+	lenFig := len(figures)
+	lenMoves := len(movesPos)
+
+	stoppedCountLeft := maxStoppedRocks
+	for {
+		if stoppedCountLeft == 0 {
+			break
+		}
+		fig := figures[figI]
+		figI = (figI + 1) % lenFig
+
+		fig.pos.X = newFigOffset.X
+		fig.pos.Y = int(highestPoint) + newFigOffset.Y
+
+		if len(screen) < fig.pos.Y+fig.h+1 {
+			// Big size to reduce count of (re)allocations and reduce run time
+			newScreen := make([]uint8, (fig.pos.Y+fig.h)*100000)
+			copy(newScreen, screen)
+			screen = newScreen
+		}
+
+		for {
+			move := movesPos[moveI]
+			moveI = (moveI + 1) % lenMoves
+
+			// move
+			if figCanMove(&fig, &move, width, &screen) {
+				fig.pos.X += move.X
+			}
+
+			// fall
+			if figCanMove(&fig, &moveDown, width, &screen) {
+				fig.pos.Y--
+			} else {
+				drawFig(&fig, &screen)
+				figHigh := fig.pos.Y + fig.h - 1
+				highestPoint = util.Max(highestPoint, figHigh)
+				stoppedCountLeft--
+				if checkPatterns {
+					depthMap := calcDepthMap(&screen, highestPoint)
+					key := Key{fig: figI, move: moveI, depth: depthMap}
+					prevS, ok := seen[key]
+					if ok {
+						diffHeight := highestPoint - prevS.height
+						cycleLength := prevS.stopped - stoppedCountLeft
+
+						countCylcesLeft := stoppedCountLeft / cycleLength
+						heightInCycles = diffHeight * countCylcesLeft
+
+						stoppedCountLeft = stoppedCountLeft % cycleLength
+						checkPatterns = false
+					} else {
+						state := State{height: highestPoint, stopped: stoppedCountLeft}
+						seen[key] = state
+					}
+				}
+				break
+			}
 		}
 	}
-	return false
+
+	return int64(heightInCycles) + int64(highestPoint)
 }
 
-func getXMove(wind string) int64 {
-	if wind == ">" {
-		return 1
-	} else {
-		return -1
-	}
+func partA() int64 {
+	done := goaocd.Duration("Part A")
+	defer done()
+
+	return simulate(2022)
 }
 
-type rock struct {
-	points []DataStruct.Point
-	height int64
+func partB() int64 {
+	done := goaocd.Duration("Part B")
+	defer done()
+
+	return simulate(1000000000000)
+}
+
+func main() {
+	fmt.Printf("Part A: %d\n", partA())
+	fmt.Printf("Part B: %d\n", partB())
 }

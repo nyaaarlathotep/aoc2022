@@ -47,3 +47,7 @@ I've been working on it for a long time.
 ## day18
 
 There are cubes not connected to other cubes...
+
+Damn it! My answer is right, I just underestimate the limit of the biggest air pocket.
+
+The code of reddit is more useful and easy though, perhaps It's the real meaning of exterior surface in 3d.

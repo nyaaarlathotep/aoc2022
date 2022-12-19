@@ -11,15 +11,21 @@ import (
 	"time"
 )
 
-const size = 10
-const limit = 500
+const limit = 1500
 
 func main() {
 	start := time.Now()
 	input := util.GetInput("18")
 	lines := util.GetStringSlice(input, "\n")
 
-	//partOne(lines)
+	partOne(lines)
+	partTwo(lines)
+
+	elapsed := time.Now().Sub(start)
+	log.Println("该函数执行完成耗时：", elapsed)
+}
+
+func partTwo(lines []string) {
 	m := make(map[DataStruct.Point3d]int64)
 	for _, line := range lines {
 		pointAru := strings.Split(line, ",")
@@ -44,18 +50,17 @@ func main() {
 	}
 	airPockets := make([][]DataStruct.Point3d, 0)
 	edges := c.Select(maps.Keys(m), func(p DataStruct.Point3d) bool { return m[p] < 0 })
+	outer := make(map[DataStruct.Point3d]int)
+	start := DataStruct.Point3d{X: 1, Y: 1, Z: 1}
+	outer[start] = 1
+	getAirPocket(start, m, &outer)
 	for _, edge := range edges {
-		if contain(airPockets, edge) {
+		if _, ok := outer[edge]; ok || contain(airPockets, edge) {
 			continue
 		}
-		//ppp := DataStruct.Point3d{X: 2, Y: 2, Z: 5}
-		//if edge == ppp {
-		//	log.Printf("%v", "111")
-		//}
 		newAirPocket := make(map[DataStruct.Point3d]int)
 		newAirPocket[edge] = 1
 		getAirPocket(edge, m, &newAirPocket)
-
 		if len(newAirPocket) > limit {
 			continue
 		}
@@ -71,11 +76,7 @@ func main() {
 		}
 		totalAir += airThisTime
 	}
-	log.Printf("%v", totalAir)
 	log.Printf("%v", total2+totalAir)
-
-	elapsed := time.Now().Sub(start)
-	log.Println("该函数执行完成耗时：", elapsed)
 }
 
 func getTotal(meaningP []int64) int64 {
