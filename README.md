@@ -59,3 +59,5 @@ copied...
 ## day20
 
 okay, % (length - 1). I got it, thanks, reddit.
+
+fffff, I thought I misunderstand the order again.

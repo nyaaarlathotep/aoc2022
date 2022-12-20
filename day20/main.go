@@ -9,11 +9,53 @@ import (
 func main() {
 	start := time.Now()
 	lines := util.GetLines("20")
+	mixOrder := partOne(lines)
+	partTwo(lines, mixOrder)
+
+	elapsed := time.Now().Sub(start)
+	fmt.Println("该函数执行完成耗时：", elapsed)
+}
+
+func partTwo(lines []string, mixOrder []*link) {
 	zeroLink, startLink, length := initial(lines)
 	p := startLink
-	moveCount := 0
 	for {
-		//printLink(zeroLink)
+		p.partTwoNum = p.num * 811589153
+		p = p.right
+		if p == startLink {
+			break
+		}
+	}
+	for i := 0; i < 10; i++ {
+		mixTwo(zeroLink, length, mixOrder)
+	}
+	printPartTwo(startLink)
+	fmt.Println(getGroveCoordinates(zeroLink))
+}
+
+func printPartTwo(zeroLink *link) *link {
+	p := zeroLink.right
+	fmt.Printf("%v", zeroLink.partTwoNum)
+	for p.num != zeroLink.num {
+		fmt.Printf(" -> %v", p.partTwoNum)
+		p = p.right
+	}
+	fmt.Println()
+	return p
+}
+
+func partOne(lines []string) []*link {
+	zeroLink, startLink, length := initial(lines)
+	mixOrder := mixOne(startLink, length)
+	fmt.Println(getNumAt(1000, length, zeroLink) + getNumAt(2000, length, zeroLink) + getNumAt(3000, length, zeroLink))
+	return mixOrder
+}
+
+func mixOne(startLink *link, length int) []*link {
+	p := startLink
+	moveCount := 0
+	mixOrder := make([]*link, 0)
+	for {
 		p = p.right
 		movingP := p.left
 		if movingP.moved {
@@ -21,6 +63,7 @@ func main() {
 		}
 		movingP.moved = true
 		moveCount++
+		mixOrder = append(mixOrder, movingP)
 		dest := movingP
 		moves := movingP.num % (length - 1)
 		if moves > 0 {
@@ -38,10 +81,32 @@ func main() {
 			break
 		}
 	}
-	//printLink(zeroLink)
-	fmt.Println(getNumAt(1000, length, zeroLink) + getNumAt(2000, length, zeroLink) + getNumAt(3000, length, zeroLink))
-	elapsed := time.Now().Sub(start)
-	fmt.Println("该函数执行完成耗时：", elapsed)
+	return mixOrder
+}
+
+func mixTwo(startLink *link, length int, mixOrder []*link) {
+	for _, order := range mixOrder {
+		movingP := startLink
+		for {
+			if movingP.num == order.num {
+				break
+			}
+			movingP = movingP.right
+		}
+		dest := movingP
+		moves := movingP.partTwoNum % (length - 1)
+		if moves > 0 {
+			for i := 0; i < moves; i++ {
+				dest = dest.right
+			}
+			addToRight(movingP, dest)
+		} else if moves < 0 {
+			for i := 0; i > moves; i-- {
+				dest = dest.left
+			}
+			addToLeft(movingP, dest)
+		}
+	}
 }
 
 func getNumAt(i int, length int, zeroLink *link) int {
@@ -51,6 +116,32 @@ func getNumAt(i int, length int, zeroLink *link) int {
 		p = p.right
 	}
 	return p.num
+}
+
+func getPartTwoNumAt(i int, length int, zeroLink *link) int {
+	count := i % length
+	p := zeroLink
+	for i = 0; i < count; i++ {
+		p = p.right
+	}
+	return p.partTwoNum
+}
+
+func getGroveCoordinates(zero *link) int {
+	gc := []int{}
+
+	cur := zero
+	//for cur.partTwoNum != 0 {
+	//	cur = cur.right
+	//}
+
+	for len(gc) < 3 {
+		for i := 0; i < 1000; i++ {
+			cur = cur.right
+		}
+		gc = append(gc, cur.partTwoNum)
+	}
+	return gc[0] + gc[1] + gc[2]
 }
 
 func addToLeft(movingP *link, dest *link) {
@@ -111,8 +202,10 @@ func initial(lines []string) (*link, *link, int) {
 }
 
 type link struct {
-	left  *link
-	right *link
-	num   int
-	moved bool
+	left       *link
+	right      *link
+	num        int
+	partTwoNum int
+	moveNum    int
+	moved      bool
 }
