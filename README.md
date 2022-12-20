@@ -55,3 +55,7 @@ The code of reddit is more useful and easy though, perhaps It's the real meaning
 ## day19
 
 copied...
+
+## day20
+
+okay, % (length - 1). I got it, thanks, reddit.

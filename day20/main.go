@@ -13,7 +13,7 @@ func main() {
 	p := startLink
 	moveCount := 0
 	for {
-		printLink(zeroLink)
+		//printLink(zeroLink)
 		p = p.right
 		movingP := p.left
 		if movingP.moved {
@@ -22,7 +22,7 @@ func main() {
 		movingP.moved = true
 		moveCount++
 		dest := movingP
-		moves := movingP.num % length
+		moves := movingP.num % (length - 1)
 		if moves > 0 {
 			for i := 0; i < moves; i++ {
 				dest = dest.right
@@ -38,7 +38,7 @@ func main() {
 			break
 		}
 	}
-	printLink(zeroLink)
+	//printLink(zeroLink)
 	fmt.Println(getNumAt(1000, length, zeroLink) + getNumAt(2000, length, zeroLink) + getNumAt(3000, length, zeroLink))
 	elapsed := time.Now().Sub(start)
 	fmt.Println("该函数执行完成耗时：", elapsed)
