@@ -41,8 +41,6 @@ func main() {
 				functions: nil,
 				value:     v,
 			},
-			monkeyName: [2]string{},
-			operation:  nil,
 		}
 	}
 	//for _, m := range monkeyMap {
@@ -86,7 +84,6 @@ func parseMonkey(parts []string, m *monkey) *monkey {
 		m = &monkey{
 			name:       parts[0],
 			hasValue:   false,
-			value:      valueWithHuman{},
 			monkeyName: [2]string{waitedMonkey[0], waitedMonkey[1]},
 			operation:  addHuman,
 		}
@@ -97,7 +94,6 @@ func parseMonkey(parts []string, m *monkey) *monkey {
 		m = &monkey{
 			name:       parts[0],
 			hasValue:   false,
-			value:      valueWithHuman{},
 			monkeyName: [2]string{waitedMonkey[0], waitedMonkey[1]},
 			operation:  minusHuman,
 		}
@@ -108,7 +104,6 @@ func parseMonkey(parts []string, m *monkey) *monkey {
 		m = &monkey{
 			name:       parts[0],
 			hasValue:   false,
-			value:      valueWithHuman{},
 			monkeyName: [2]string{waitedMonkey[0], waitedMonkey[1]},
 			operation:  mulHuman,
 		}
@@ -119,7 +114,6 @@ func parseMonkey(parts []string, m *monkey) *monkey {
 		m = &monkey{
 			name:       parts[0],
 			hasValue:   false,
-			value:      valueWithHuman{},
 			monkeyName: [2]string{waitedMonkey[0], waitedMonkey[1]},
 			operation:  divHuman,
 		}
@@ -185,7 +179,7 @@ func minusHuman(a, b valueWithHuman) valueWithHuman {
 		return valueWithHuman{
 			hasHuman: true,
 			functions: append(b.functions, func(value int) int {
-				return value - a.value
+				return a.value - value
 			}),
 		}
 	}
