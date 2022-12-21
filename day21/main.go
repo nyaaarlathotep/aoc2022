@@ -244,6 +244,6 @@ func divHuman(a, b valueWithHuman) valueWithHuman {
 	}
 	return valueWithHuman{
 		hasHuman: false,
-		value:    mul(a.value, b.value),
+		value:    div(a.value, b.value),
 	}
 }
