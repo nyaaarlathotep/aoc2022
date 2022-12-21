@@ -61,3 +61,5 @@ copied...
 okay, % (length - 1). I got it, thanks, reddit.
 
 fffff, I thought I misunderstand the order again.
+
+I still can't find out why. But It's time for the next day's puzzle.
