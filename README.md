@@ -67,3 +67,7 @@ I still can't find out why. But It's time for the next day's puzzle.
 ## day21
 
 Now the question is, what will the part two be?
+
+I see... You bastard!
+
+I passed the sample again and fail the real one. Why?
