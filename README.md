@@ -73,3 +73,7 @@ I see... You bastard!
 I passed the sample again and fail the real one. Why?
 
 Stupid!
+
+## day22
+
+Jesus. What a surprise.I need another 4 hours for this puzzle.
