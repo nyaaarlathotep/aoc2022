@@ -14,6 +14,14 @@ func GetInput(day string) string {
 	return string(f)
 }
 
+func GetInputFile(day string, name string) string {
+	f, err := ioutil.ReadFile(path.Join("day"+day, name))
+	if err != nil {
+		log.Fatalln("read fail", err)
+	}
+	return string(f)
+}
+
 func GetLines(day string) []string {
 	f, err := ioutil.ReadFile(path.Join("day"+day, "input"))
 	if err != nil {
