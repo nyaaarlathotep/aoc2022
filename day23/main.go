@@ -5,6 +5,7 @@ import (
 	"aoc2022/util"
 	"fmt"
 	"golang.org/x/exp/maps"
+	"math"
 	"time"
 )
 
@@ -35,7 +36,9 @@ func main() {
 			}
 		}
 	}
-	printG(g)
+	dirs := []func(elf DataStruct.Point, g *DataStruct.Grid[rune]) (DataStruct.Point, bool){goNorth, goSouth, goWest, goEast}
+	dirIndex := 0
+	//printG(g)
 	for i := 0; i < 10; i++ {
 		dest := make(map[DataStruct.Point]DataStruct.Point)
 		for _, elf := range elves {
@@ -52,12 +55,12 @@ func main() {
 				continue
 			}
 
-			p := getNextLegalP(elf, g)
-			fmt.Printf("%+v -> %+v\n", elf, p)
+			p := getNextLegalP(elf, g, dirIndex, dirs)
+			//fmt.Printf("%+v -> %+v\n", elf, p)
 			if _, ok := dest[p]; !ok {
 				dest[p] = elf
 			} else {
-				fmt.Printf("duplicate: %+v\n", p)
+				//fmt.Printf("duplicate: %+v\n", p)
 				delete(dest, p)
 			}
 		}
@@ -66,14 +69,35 @@ func main() {
 			g.SetState(p.X, p.Y, elfPlaceHolder)
 		}
 		elves = maps.Keys(g.StateMapWhere(func(r rune) bool { return r == elfPlaceHolder }))
-		printG(g)
+		//printG(g)
+		dirIndex++
+	}
+	minX := int64(math.MaxInt64)
+	maxX := int64(0)
+	minY := int64(math.MaxInt64)
+	maxY := int64(0)
+	for _, p := range elves {
+		if p.X > maxX {
+			maxX = p.X
+		}
+		if p.X < minX {
+			minX = p.X
+		}
+		if p.Y > maxY {
+			maxY = p.Y
+		}
+		if p.Y < minY {
+			minY = p.Y
+		}
 	}
 
+	fmt.Printf("%v\n", (maxX-minX+1)*(maxY-minY+1)-int64(len(elves)))
 	elapsed := time.Now().Sub(start)
 	fmt.Println("该函数执行完成耗时：", elapsed)
 }
 
-func getNextLegalP(elf DataStruct.Point, g *DataStruct.Grid[rune]) DataStruct.Point {
+func getNextLegalP(elf DataStruct.Point, g *DataStruct.Grid[rune], dirIndex int,
+	fs []func(elf DataStruct.Point, g *DataStruct.Grid[rune]) (DataStruct.Point, bool)) DataStruct.Point {
 	ss := DataStruct.Point{
 		X: 13,
 		Y: 11,
@@ -81,6 +105,16 @@ func getNextLegalP(elf DataStruct.Point, g *DataStruct.Grid[rune]) DataStruct.Po
 	if elf == ss {
 		fmt.Printf("")
 	}
+	for i := 0; i < 4; i++ {
+		fi := (dirIndex + i) % 4
+		if point, done := fs[fi](elf, g); done {
+			return point
+		}
+	}
+	return elf.Clone()
+}
+
+func goNorth(elf DataStruct.Point, g *DataStruct.Grid[rune]) (DataStruct.Point, bool) {
 	points := [3]DataStruct.Point{elf.Add(DataStruct.Directions8[3]), elf.Add(DataStruct.Directions8[4]), elf.Add(DataStruct.Directions8[5])}
 	block := false
 	for _, p := range points {
@@ -91,46 +125,58 @@ func getNextLegalP(elf DataStruct.Point, g *DataStruct.Grid[rune]) DataStruct.Po
 		}
 	}
 	if !block {
-		return elf.Add(DataStruct.Directions8[4])
+		return elf.Add(DataStruct.Directions8[4]), true
 	}
-	block = false
-	points = [3]DataStruct.Point{elf.Add(DataStruct.Directions8[0]), elf.Add(DataStruct.Directions8[1]), elf.Add(DataStruct.Directions8[7])}
-	for _, p := range points {
-		r := g.GetPointState(p)
-		if r == elfPlaceHolder {
-			block = true
-			break
-		}
-	}
-	if !block {
-		return elf.Add(DataStruct.Directions8[0])
-	}
-	block = false
-	points = [3]DataStruct.Point{elf.Add(DataStruct.Directions8[5]), elf.Add(DataStruct.Directions8[6]), elf.Add(DataStruct.Directions8[7])}
-	for _, p := range points {
-		r := g.GetPointState(p)
-		if r == elfPlaceHolder {
-			block = true
-			break
-		}
-	}
-	if !block {
-		return elf.Add(DataStruct.Directions8[6])
-	}
-	block = false
-	points = [3]DataStruct.Point{elf.Add(DataStruct.Directions8[1]), elf.Add(DataStruct.Directions8[2]), elf.Add(DataStruct.Directions8[3])}
-	for _, p := range points {
-		r := g.GetPointState(p)
-		if r == elfPlaceHolder {
-			block = true
-			break
-		}
-	}
-	if !block {
-		return elf.Add(DataStruct.Directions8[2])
-	}
-	return elf.Clone()
+	return DataStruct.Point{}, false
 }
+
+func goSouth(elf DataStruct.Point, g *DataStruct.Grid[rune]) (DataStruct.Point, bool) {
+	block := false
+	points := [3]DataStruct.Point{elf.Add(DataStruct.Directions8[0]), elf.Add(DataStruct.Directions8[1]), elf.Add(DataStruct.Directions8[7])}
+	for _, p := range points {
+		r := g.GetPointState(p)
+		if r == elfPlaceHolder {
+			block = true
+			break
+		}
+	}
+	if !block {
+		return elf.Add(DataStruct.Directions8[0]), true
+	}
+	return DataStruct.Point{}, false
+}
+
+func goWest(elf DataStruct.Point, g *DataStruct.Grid[rune]) (DataStruct.Point, bool) {
+	block := false
+	points := [3]DataStruct.Point{elf.Add(DataStruct.Directions8[5]), elf.Add(DataStruct.Directions8[6]), elf.Add(DataStruct.Directions8[7])}
+	for _, p := range points {
+		r := g.GetPointState(p)
+		if r == elfPlaceHolder {
+			block = true
+			break
+		}
+	}
+	if !block {
+		return elf.Add(DataStruct.Directions8[6]), true
+	}
+	return DataStruct.Point{}, false
+}
+func goEast(elf DataStruct.Point, g *DataStruct.Grid[rune]) (DataStruct.Point, bool) {
+	block := false
+	points := [3]DataStruct.Point{elf.Add(DataStruct.Directions8[1]), elf.Add(DataStruct.Directions8[2]), elf.Add(DataStruct.Directions8[3])}
+	for _, p := range points {
+		r := g.GetPointState(p)
+		if r == elfPlaceHolder {
+			block = true
+			break
+		}
+	}
+	if !block {
+		return elf.Add(DataStruct.Directions8[2]), true
+	}
+	return DataStruct.Point{}, false
+}
+
 func printG(g *DataStruct.Grid[rune]) {
 	fmt.Printf("%v", g.StateString(func(rune2 rune) string {
 		if rune2 == blank {
