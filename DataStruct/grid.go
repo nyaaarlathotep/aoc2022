@@ -111,7 +111,7 @@ func (g *Grid[T]) StateString(f func(t T) string) string {
 	var ret strings.Builder
 
 	for i, y := range g.state {
-		if i > 20 {
+		if i > 40 {
 			break
 		}
 		for _, x := range y {

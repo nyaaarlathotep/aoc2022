@@ -11,3 +11,10 @@ func (p *Point) Add(b Point) Point {
 		Y: p.Y + b.Y,
 	}
 }
+
+func (p *Point) Clone() Point {
+	return Point{
+		X: p.X,
+		Y: p.Y,
+	}
+}
