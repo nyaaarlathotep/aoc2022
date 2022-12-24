@@ -81,3 +81,7 @@ Jesus. What a surprise.I need another 4 hours for this puzzle.
 ## day23
 
 You just can't read, right?
+
+## day24
+
+Forgive me.
